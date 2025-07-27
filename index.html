@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Catalogue Futurisme Premium</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Three.js CDN (will be loaded by threejs-background.js) -->
+    <style>
+        /* Définition des variables CSS pour les couleurs */
+        :root {
+            --primary-bg: #1a1a1a;
+            --accent-blue: #00aaff;
+            --accent-green: #00ff88; /* Nouvelle couleur d'accent */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: #ffffff;
+            overflow-x: hidden; /* Empêche le défilement horizontal */
+        }
+        /* Styles pour la lueur néon (bleu) - ajustés pour subtilité */
+        .neon-glow-blue {
+            box-shadow: 0 0 3px var(--accent-blue), 0 0 6px var(--accent-blue), 0 0 9px var(--accent-blue);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .neon-glow-blue:hover {
+            box-shadow: 0 0 6px var(--accent-blue), 0 0 12px var(--accent-blue), 0 0 18px var(--accent-blue);
+        }
+        /* Styles pour le header flou */
+        .header-blur {
+            background-color: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Pour la compatibilité Safari */
+            transition: background-color 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
+            padding: 1rem 2rem; /* Slightly more padding */
+        }
+        /* Header specific enhancements */
+        .header-blur .text-3xl {
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5), 0 0 10px rgba(0, 255, 136, 0.3); /* Subtle green glow */
+        }
+        .header-blur nav ul li a {
+            position: relative;
+        }
+        .header-blur nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-blue);
+            transition: width 0.3s ease-out;
+        }
+        .header-blur nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Masque le défilement pour les sections */
+        .hidden-section {
+            display: none;
+        }
+        /* Style pour le modal */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
+        }
+        /* RTL support for Arabic */
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        .ltr {
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* RTL specific adjustments */
+        .rtl .header-blur {
+            flex-direction: row-reverse; /* Reverse order of flex items if needed, though justify-between handles most */
+        }
+        .rtl nav ul {
+            flex-direction: row-reverse; /* Reverse order of nav items */
+        }
+        .rtl #lang-toggle span:first-child {
+            border-radius: 0 0.375rem 0.375rem 0; /* rounded-md on right side for AR */
+        }
+        .rtl #lang-toggle span:last-child {
+            border-radius: 0.375rem 0 0 0.375rem; /* rounded-md on left side for EN */
+        }
+        .rtl .modal-content #close-modal {
+            right: auto; /* Reset right */
+            left: 1rem; /* Move to left */
+        }
+        .rtl #prev-image {
+            left: auto;
+            right: 0.5rem;
+        }
+        .rtl #next-image {
+            right: auto;
+            left: 0.5rem;
+        }
+        .rtl #modal-image-thumbnails {
+            flex-direction: row-reverse; /* Reverse order of thumbnails */
+        }
+        .rtl .list-disc {
+            list-style-position: inside; /* Ensure bullets are inside */
+            padding-right: 1.5rem; /* Add padding for bullets on the right */
+            padding-left: 0;
+        }
+        .rtl .list-disc li {
+            text-align: right; /* Ensure list item text is right-aligned */
+        }
+        .rtl .md\:flex-row {
+            flex-direction: row-reverse; /* Reverse flex direction for modal content on medium screens */
+        }
+
+        /* Language Toggle Specific Styles */
+        #lang-toggle {
+            position: relative;
+            padding: 0; /* Remove default padding */
+            background-color: transparent;
+            border: 1px solid var(--accent-blue);
+            color: white;
+            border-radius: 0.5rem; /* rounded-lg */
+            overflow: hidden;
+            display: flex; /* Use flexbox for inner spans */
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease-in-out;
+        }
+        #lang-toggle span {
+            padding: 0.5rem 0.75rem; /* px-3 py-2 */
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+            display: block; /* Make spans block-level for padding */
+        }
+        #lang-toggle span.active {
+            background-color: var(--accent-blue);
+            color: var(--primary-bg);
+            font-weight: bold;
+            box-shadow: 0 0 5px var(--accent-blue); /* Subtle glow for active state */
+        }
+        .ltr #lang-toggle span:first-child {
+            border-top-left-radius: 0.375rem; /* rounded-md */
+            border-bottom-left-radius: 0.375rem; /* rounded-md */
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .ltr #lang-toggle span:last-child {
+            border-top-right-radius: 0.375rem; /* rounded-md */
+            border-bottom-right-radius: 0.375rem; /* rounded-md */
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        #lang-toggle span:not(.active):hover {
+            background-color: rgba(0, 170, 255, 0.2); /* Subtle hover for inactive */
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--accent-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Back to Top Button */
+        #back-to-top-btn {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99;
+            font-size: 18px;
+            border: none;
+            outline: none;
+            background-color: var(--accent-blue);
+            color: var(--primary-bg);
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 50%;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        #back-to-top-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Search Bar Styling */
+        #search-bar-container {
+            position: relative;
+            margin-right: 1rem; /* Space from language toggle */
+        }
+
+        #search-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            width: 200px; /* Default width */
+            transition: width 0.3s ease-in-out, background-color 0.3s, border-color 0.3s;
+        }
+
+        #search-input:focus {
+            width: 250px; /* Expand on focus */
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent-green);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-[--primary-bg] text-white">
+
+    <!-- Header Fixe -->
+    <header class="fixed top-0 left-0 w-full z-50 p-4 header-blur flex justify-between items-center rounded-b-lg">
+        <div class="text-3xl font-bold text-[--accent-green]">
+            Alpha Care For Trading
+        </div>
+        <nav>
+            <ul class="flex space-x-6">
+                <li><a href="/" class="text-white hover:text-[--accent-blue] transition-colors duration-300" data-key="home">Accueil</a></li>
+                <li><a href="/categories" class="text-white hover:text-[--accent-blue] transition-colors duration-300" data-key="categories">Catégories</a></li>
+                <li><a href="/contact" class="text-white hover:text-[--accent-blue] transition-colors duration-300" data-key="contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="flex items-center space-x-2">
+            <!-- Search Bar -->
+            <div id="search-bar-container">
+                <input type="text" id="search-input" placeholder="Rechercher..." class="text-sm">
+            </div>
+            <!-- Language Toggle -->
+            <button id="lang-toggle">
+                <span id="lang-en" data-lang="en">EN</span>
+                <span id="lang-ar" data-lang="ar">AR</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Section Principale (Hero) -->
+    <section id="hero" class="relative h-screen flex flex-col justify-center items-center text-center overflow-hidden">
+        <canvas id="three-canvas" class="absolute inset-0 w-full h-full z-0"></canvas>
+        <div class="relative z-10 p-8 rounded-lg">
+            <h1 class="text-5xl md:text-7xl font-bold text-[--accent-green] mb-4" data-key="heroTitle">Découvrez notre Collection d'Exception</h1>
+            <p class="text-lg md:text-xl text-white text-opacity-80 mb-8" data-key="heroSlogan">Innovation et Qualité Supérieure à Portée de Main</p>
+            <button id="explore-catalogue" class="px-8 py-4 bg-[--accent-blue] text-[--primary-bg] font-bold text-xl rounded-full neon-glow-blue transition-all duration-300 hover:scale-105">
+                <span data-key="exploreButton">Explorer le Catalogue</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Section Catégories de Produits -->
+    <section id="categories" class="min-h-screen p-8 pt-24 hidden-section">
+        <h2 class="text-4xl md:text-5xl font-bold text-[--accent-green] text-center mb-12" data-key="categoriesTitle">Nos Catégories de Produits</h2>
+        <div id="categories-loading" class="spinner"></div>
+        <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <!-- Les cartes de catégories seront injectées ici par JS -->
+        </div>
+    </section>
+
+    <!-- Section Liste de Produits -->
+    <section id="product-list" class="min-h-screen p-8 pt-24 hidden-section">
+        <h2 id="product-list-title" class="text-4xl md:text-5xl font-bold text-[--accent-green] text-center mb-12"></h2>
+        <div id="products-loading" class="spinner"></div>
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <!-- Les cartes de produits seront injectées ici par JS -->
+        </div>
+        <button id="back-to-categories" class="mt-12 px-6 py-3 bg-[--accent-blue] text-[--primary-bg] font-bold rounded-full neon-glow-blue transition-all duration-300 hover:scale-105 block mx-auto">
+            <span data-key="backToCategories">Retour aux Catégories</span>
+        </button>
+    </section>
+
+    <!-- Modal de Détails du Produit -->
+    <div id="product-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay p-4" role="dialog" aria-modal="true" aria-labelledby="modal-product-name">
+        <div class="modal-content w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg p-8 relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-[--accent-blue] text-3xl font-bold hover:scale-125 transition-transform duration-300" aria-label="Fermer le modal">&times;</button>
+            <div id="modal-content-wrapper" class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2 flex flex-col items-center">
+                    <!-- Image Carousel -->
+                    <div class="relative w-full mb-4">
+                        <img id="modal-product-image" src="" alt="Product Image" class="w-full h-auto object-contain rounded-lg border border-[--accent-blue] neon-glow-blue">
+                        <button id="prev-image" class="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300" aria-label="Image précédente">&lt;</button>
+                        <button id="next-image" class="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300" aria-label="Image suivante">&gt;</button>
+                    </div>
+                    <div id="modal-image-thumbnails" class="flex space-x-2 overflow-x-auto justify-center w-full">
+                        <!-- Les miniatures d'images seront injectées ici -->
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <h3 id="modal-product-name" class="text-4xl font-bold text-[--accent-green] mb-4"></h3>
+                    <p id="modal-product-description" class="text-lg text-white text-opacity-90 mb-6"></p>
+
+                    <!-- Product Size Options -->
+                    <div id="modal-product-sizes" class="mb-6 hidden">
+                        <h4 class="text-xl font-bold text-[--accent-blue] mb-2" data-key="availableSizes">Available Sizes:</h4>
+                        <div id="size-options-container" class="flex flex-wrap gap-3">
+                            <!-- Size options will be injected here -->
+                        </div>
+                    </div>
+
+                    <div id="modal-product-specs" class="mb-6">
+                        <h4 class="text-xl font-bold text-[--accent-blue] mb-2" data-key="specificationsTitle">Spécifications:</h4>
+                        <ul class="list-disc list-inside text-white text-opacity-80">
+                            <!-- Les spécifications seront injectées ici -->
+                        </ul>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="modal-contact-button" class="px-6 py-3 bg-[--accent-blue] text-[--primary-bg] font-bold rounded-full neon-glow-blue transition-all duration-300 hover:scale-105">
+                            <span data-key="contactForInfo">Contacter pour plus d'infos</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Contact / Informations -->
+    <section id="contact" class="min-h-screen p-8 pt-24 hidden-section flex flex-col items-center justify-center">
+        <h2 class="text-4xl md:text-5xl font-bold text-[--accent-green] text-center mb-12" data-key="contactTitle">Contactez-nous</h2>
+        <div class="bg-[--primary-bg] p-8 rounded-lg border border-[--accent-blue] neon-glow-blue max-w-2xl w-full text-center">
+            <p class="text-lg mb-4 text-white text-opacity-90" data-key="contactSlogan">Nous sommes là pour répondre à toutes vos questions.</p>
+            <div class="mb-6">
+                <p class="text-xl font-bold text-[--accent-blue] mb-2" data-key="email">Email:</p>
+                <a href="mailto:info@alphacare.com" class="text-white hover:text-[--accent-blue] transition-colors duration-300">info@alphacare.com</a>
+            </div>
+            <div class="mb-6">
+                <p class="text-xl font-bold text-[--accent-blue] mb-2" data-key="phone">Téléphone:</p>
+                <p class="text-white">966500000000</p>
+            </div>
+            <div class="mb-6">
+                <p class="text-xl font-bold text-[--accent-blue] mb-2" data-key="socialMedia">Réseaux Sociaux:</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#" class="text-white hover:text-[--accent-blue] transition-colors duration-300">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.505 1.492-3.89 3.776-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33V22C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                    </a>
+                    <a href="#" class="text-white hover:text-[--accent-blue] transition-colors duration-300">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.41-4.288 4.106 4.106 0 001.27 5.477A4.072 4.072 0 014 9.748v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.188a11.644 11.644 0 006.29 2.063z" /></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top-btn" title="Retour en haut">↑</button>
+
+    <!-- Main JavaScript module -->
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
