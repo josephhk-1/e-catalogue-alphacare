@@ -895,3 +895,48 @@ export const setCurrentLang = (lang) => {
     currentLang = lang;
     console.log(`Language set to: ${currentLang}`); // Debugging log
 };
+
+// --- NEW CODE ADDED BELOW ---
+
+/**
+ * Simulates fetching categories data from an API.
+ * @returns {Promise<Array>} A promise that resolves with the categories data.
+ */
+export function fetchCategories() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(categoriesData);
+        }, 500); // Simulate network delay
+    });
+}
+
+/**
+ * Simulates fetching products for a given category from an API.
+ * @param {string} categoryId - The ID of the category to fetch products for.
+ * @returns {Promise<Array>} A promise that resolves with the products data for the category.
+ */
+export function fetchProducts(categoryId) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(productsData[categoryId] || []);
+        }, 500); // Simulate network delay
+    });
+}
+
+/**
+ * Simulates fetching a single product by its ID and category ID from an API.
+ * @param {string} categoryId - The ID of the product's category.
+ * @param {string} productId - The ID of the product.
+ * @returns {Promise<Object|undefined>} A promise that resolves with the product object or undefined if not found.
+ */
+export function fetchProductById(categoryId, productId) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            if (productsData[categoryId]) {
+                resolve(productsData[categoryId].find(p => p.id === productId));
+            } else {
+                resolve(undefined);
+            }
+        }, 300); // Simulate network delay
+    });
+}
