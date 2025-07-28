@@ -334,7 +334,7 @@ export const productsData = {
             name_en: 'Finish Stain Remover',
             name_ar: 'فنش مزيل بقع',
             description_en: 'Powerful stain remover that effectively tackles tough stains on various fabrics, ensuring spotless results.',
-            description_ar: 'مزيل بقع قوي يعالج البقع الصعبة بفعالية على مختلف الأقمشة، مما يضمن نتائج خالية من البقع.',
+            description_ar: 'مزيل بقع قوي يعالج البقع الصعبة بفعacité على مختلف الأقمشة، مما يضمن نتائج خالية من البقع.',
             images: ['https://placehold.co/600x400/1a1a1a/00ff88?text=Finish+Stain+Remover'],
             variants: [
                 { size_en: '900 ml', size_ar: '900 مل', specs_en: ['Volume: 900 ml', 'Type: Liquid', 'Usage: Stain removal'], specs_ar: ['الحجم: 900 مل', 'النوع: سائل', 'الاستخدام: إزالة البقع'] }
