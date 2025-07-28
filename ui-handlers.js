@@ -116,7 +116,7 @@ export async function renderCategories() {
         document.querySelectorAll('.category-card').forEach(card => {
             card.addEventListener('click', () => {
                 const categoryId = card.dataset.categoryId;
-                navigateTo(`/categories/${categoryId}`);
+                navigateTo(`#/categories/${categoryId}`); // Use hash-based navigation
             });
         });
 
@@ -199,7 +199,7 @@ export async function renderProducts(categoryId, filteredProducts = null) {
                 const card = event.target.closest('.product-card');
                 const productId = card.dataset.productId;
                 const categoryId = card.dataset.categoryId;
-                navigateTo(`/products/${productId}?category=${categoryId}`); // Update URL for product detail
+                navigateTo(`#/products/${productId}?category=${categoryId}`); // Use hash-based navigation for product detail
             });
         });
 
@@ -440,23 +440,45 @@ export function initUIHandlers() {
 
     // Event listener for "Explore Catalogue" button
     document.getElementById('explore-catalogue').addEventListener('click', () => {
-        navigateTo('/categories');
+        navigateTo('#/categories'); // Use hash-based navigation
     });
 
     // Event listener for "Back to Categories" button
     document.getElementById('back-to-categories').addEventListener('click', () => {
-        navigateTo('/categories');
+        navigateTo('#/categories'); // Use hash-based navigation
     });
 
     // Event listener for closing the modal
     document.getElementById('close-modal').addEventListener('click', () => {
         toggleModal(false);
+        // When closing modal, navigate back to the product list URL
+        const currentHash = window.location.hash;
+        if (currentHash.includes('#/products/')) {
+            const parts = currentHash.split('?category=');
+            if (parts.length > 1) {
+                const categoryId = parts[1];
+                navigateTo(`#/categories/${categoryId}`);
+            } else {
+                navigateTo('#/categories');
+            }
+        }
     });
 
     // Close modal when clicking outside the content
     document.getElementById('product-detail-modal').addEventListener('click', (event) => {
         if (event.target.id === 'product-detail-modal') {
             toggleModal(false);
+            // When closing modal by clicking overlay, navigate back to the product list URL
+            const currentHash = window.location.hash;
+            if (currentHash.includes('#/products/')) {
+                const parts = currentHash.split('?category=');
+                if (parts.length > 1) {
+                    const categoryId = parts[1];
+                    navigateTo(`#/categories/${categoryId}`);
+                } else {
+                    navigateTo('#/categories');
+                }
+            }
         }
     });
 
