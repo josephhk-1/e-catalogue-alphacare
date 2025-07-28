@@ -69,19 +69,19 @@ export function initSearch() {
                 renderProducts(null, results); // Pass null for categoryId, and the filtered results
             } else if (query.length === 0) {
                 // If search is cleared, determine appropriate navigation
-                const currentPath = window.location.pathname;
-                if (currentPath.startsWith('/categories/')) {
-                    const categoryId = currentPath.split('/')[2];
+                const currentHash = window.location.hash;
+                if (currentHash.startsWith('#/categories/')) {
+                    const categoryId = currentHash.split('/')[2];
                     if (categoryId) {
                         renderProducts(categoryId); // Re-render current category
                     } else {
-                        navigateTo('/categories'); // Go back to all categories
+                        navigateTo('#/categories'); // Go back to all categories
                     }
-                } else if (currentPath === '/categories') {
+                } else if (currentHash === '#/categories') {
                     renderCategories(); // Re-render all categories
                 } else {
                     // If on home or contact, do nothing or navigate to home
-                    navigateTo('/');
+                    navigateTo('#/');
                 }
             }
         });
